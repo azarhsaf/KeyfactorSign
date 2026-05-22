@@ -1,0 +1,1 @@
+export default function UploadDocumentPage(){return <div className='space-y-4'><h2 className='text-2xl font-semibold'>UploadDocumentPage</h2><div className='bg-white rounded border p-4'>Professional page scaffold for UploadDocumentPage.</div></div>}
