@@ -1,1 +1,1 @@
-export default function PdfViewer(){return <div className='bg-white p-4 rounded border'>PdfViewer</div>}
+export default function PdfViewer({url}:{url:string}){return <iframe className='w-full h-[70vh] rounded border bg-white' src={url} title='pdf'/>}

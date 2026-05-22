@@ -1,1 +1,3 @@
-export default function CompletedDocumentsPage(){return <div className='space-y-4'><h2 className='text-2xl font-semibold'>CompletedDocumentsPage</h2><div className='bg-white rounded border p-4'>Professional page scaffold for CompletedDocumentsPage.</div></div>}
+import { useEffect, useState } from 'react'; import { api } from '../api/client'; import DocumentTable from '../components/DocumentTable';
+export default function CompletedDocumentsPage(){const [rows,setRows]=useState<any[]>([]); useEffect(()=>{api.get('/documents/completed').then(r=>setRows(r.data))},[])
+return <div className='space-y-4'><h2 className='text-2xl font-semibold'>Completed Documents</h2><DocumentTable rows={rows} actions={(r)=><div className='flex gap-2'><a className='text-blue-600' href={`/api/documents/${r.id}/download-original`}>Original</a><a className='text-emerald-600' href={`/api/documents/${r.id}/download-signed`}>Signed</a></div>}/></div>}
