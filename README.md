@@ -1,28 +1,36 @@
-# SignPortal (POC App)
+# Keyfactor SignPortal
 
-A deployable demo web app for testing Keyfactor SignServer as a backend signing engine.
+Professional POC portal for SignServer-backed PDF signing.
 
-## Quick Start
-1. Copy env: `cp .env.example .env`
-2. Start: `docker compose up -d --build`
-3. Open: `http://localhost:8080`
+## Stack
+React + Vite + TypeScript + Tailwind, FastAPI, PostgreSQL, Nginx, Docker Compose.
 
-## Features implemented
-- Local user register/login (JWT)
-- PDF upload
-- Single/sequential workflow setup
-- Sequential step signing endpoint
-- Audit log retrieval
-- Basic portal UI
+## Deploy
+```bash
+cp .env.example .env
+docker compose up -d --build
+```
+Open `http://<server-ip>:8081`.
 
-## Core APIs
-- POST /api/register
-- POST /api/login
-- GET /api/me
-- POST /api/documents/upload
-- GET /api/documents
-- POST /api/workflows/{id}/sign
-- GET /api/audit/{document_id}
+## Default users
+- admin / Admin@123 (must change password)
+- signer1 / Signer@123
+- signer2 / Signer@123
 
-## Note
-Current signing step simulates signing by copying PDF to signed folder. Integrate actual SignServer call in `backend/app/main.py` signing flow for production.
+## SignServer
+Configure in `.env` using `SIGNSERVER_*`. Health check: `GET /api/admin/signserver/health`.
+
+## TSA
+Set `TSA_ENABLED`, `TSA_URL`, `TSA_WORKER_NAME`.
+
+## LDAP
+Set `LDAP_*` and test via `GET /api/admin/ldap/test`.
+
+## Workflows
+- Single signer: upload + one signer + sign.
+- Sequential: multiple signers ordered; each signs when current step reaches them.
+
+## Troubleshooting
+- If login fails: verify DB initialized and seed users exist.
+- If signing fails: verify SignServer endpoint and worker settings.
+- If PDF preview fails: ensure uploaded file is valid PDF.

@@ -1,0 +1,1 @@
+export default function LdapSettingsPage(){return <div className='space-y-4'><h2 className='text-2xl font-semibold'>LdapSettingsPage</h2><div className='bg-white rounded border p-4'>Professional page scaffold for LdapSettingsPage.</div></div>}

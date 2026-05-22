@@ -1,8 +1,28 @@
 {
-  "name": "signportal-frontend",
-  "version": "1.0.0",
+  "name": "keyfactor-signportal-frontend",
   "private": true,
+  "version": "1.0.0",
+  "type": "module",
   "scripts": {
-    "build": "echo '<!doctype html><html><head><meta charset=\"utf-8\"><title>SignPortal</title><style>body{font-family:Arial;padding:20px}input,button,select{margin:5px;padding:8px}.card{border:1px solid #ddd;padding:12px;margin:12px 0;border-radius:8px}</style></head><body><h1>SignPortal Demo</h1><div class=card><h3>Login</h3><input id=u placeholder=username><input id=p type=password placeholder=password><button onclick=login()>Login</button></div><div class=card><h3>Register</h3><input id=ru placeholder=username><input id=re placeholder=email><input id=rp type=password placeholder=password><select id=rr><option>admin</option><option selected>signer</option><option>viewer</option></select><button onclick=register()>Create</button></div><div class=card><h3>Upload PDF</h3><input id=dn placeholder=documentname><input id=sids placeholder=signer ids csv ex:1,2><input id=f type=file><button onclick=upload()>Upload</button></div><div class=card><h3>Documents</h3><button onclick=listDocs()>Refresh</button><pre id=docs></pre></div><script>let t='';async function register(){const d=new FormData();d.append('username',ru.value);d.append('email',re.value);d.append('password',rp.value);d.append('role',rr.value);alert(await (await fetch('/api/register',{method:'POST',body:d})).text())}async function login(){const d=new FormData();d.append('username',u.value);d.append('password',p.value);const r=await (await fetch('/api/login',{method:'POST',body:d})).json();t=r.access_token;alert('logged in')}async function upload(){const d=new FormData();d.append('document_name',dn.value);d.append('workflow_type','sequential');d.append('signer_ids',sids.value);d.append('file',f.files[0]);alert(await (await fetch('/api/documents/upload',{method:'POST',headers:{Authorization:'Bearer '+t},body:d})).text())}async function listDocs(){const r=await (await fetch('/api/documents',{headers:{Authorization:'Bearer '+t}})).json();docs.textContent=JSON.stringify(r,null,2)}</script></body></html>' > dist/index.html"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-pdf": "^9.1.1",
+    "react-router-dom": "^6.27.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.2",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.13",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.8"
   }
 }
