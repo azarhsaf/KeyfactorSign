@@ -1,0 +1,15 @@
+import hashlib
+from pypdf import PdfReader
+
+def validate_pdf(path: str):
+    PdfReader(path)
+
+def hash_file(path: str) -> str:
+    h = hashlib.sha256()
+    with open(path, 'rb') as f:
+        for chunk in iter(lambda: f.read(8192), b''):
+            h.update(chunk)
+    return h.hexdigest()
+
+def timestamp_presence_placeholder(path: str):
+    return {"timestamp_applied": False, "source": "unknown", "timestamp_time": None}
