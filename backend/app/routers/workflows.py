@@ -7,6 +7,8 @@ from app.auth.dependencies import get_current_user
 from app.services.signserver_connector import SignServerConnector
 from app.services.pdf_service import timestamp_presence_placeholder
 from app.services.audit_service import add_audit
+from app.services.email_service import EmailService
+from app.models import User
 
 router = APIRouter(prefix='/api/workflows', tags=['workflows'])
 
@@ -43,8 +45,16 @@ def sign(workflow_id: int, db: Session = Depends(get_db), user=Depends(get_curre
         total = db.query(WorkflowSigner).filter(WorkflowSigner.workflow_id == workflow_id).count()
         if wf.current_step >= total:
             wf.status = 'Completed'; doc.status = 'Completed'
+            uploader = db.query(User).filter(User.id == doc.uploaded_by).first()
+            if uploader and uploader.email:
+                EmailService().send(db, uploader.email, f'Document completed: {doc.document_name}', f'<p>Document {doc.document_name} has been completed.</p>', doc.id)
         else:
             wf.current_step += 1; wf.status = 'In Progress'; doc.status = 'In Progress'
+            next_step = db.query(WorkflowSigner).filter(WorkflowSigner.workflow_id == workflow_id, WorkflowSigner.signing_order == wf.current_step).first()
+            if next_step:
+                nxt = db.query(User).filter(User.id == next_step.signer_user_id).first()
+                if nxt and nxt.email:
+                    EmailService().send(db, nxt.email, f'Signature requested: {doc.document_name}', f'<p>Please sign document {doc.document_name}.</p>', doc.id)
         job.status = 'success'; job.signserver_request_id = str(result.get('status_code'))
         ts = timestamp_presence_placeholder(out)
         add_audit(db, 'SIGN_SUCCESS', user.id, doc.id, f'workflow={workflow_id}')
@@ -64,5 +74,8 @@ def reject(workflow_id: int, reason: str = Form(...), db: Session = Depends(get_
     if not step or step.signer_user_id != user.id: raise HTTPException(403, 'Not your step')
     step.status = 'rejected'; step.rejected_at = datetime.utcnow(); step.reject_reason = reason; wf.status = 'Rejected'
     doc = db.query(Document).filter(Document.id == wf.document_id).first(); doc.status = 'Rejected'
+    uploader = db.query(User).filter(User.id == doc.uploaded_by).first()
+    if uploader and uploader.email:
+        EmailService().send(db, uploader.email, f'Document rejected: {doc.document_name}', f'<p>Document {doc.document_name} was rejected. Reason: {reason}</p>', doc.id)
     add_audit(db, 'SIGN_REJECTED', user.id, doc.id, reason)
     db.commit(); return {"status": "Rejected"}

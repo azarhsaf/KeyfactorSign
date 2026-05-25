@@ -36,6 +36,16 @@ class Settings(BaseSettings):
     ldap_viewer_group: str = ""
     ldap_tls_verify: bool = False
 
+    smtp_enabled: bool = False
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_username: str = ""
+    smtp_password: str = ""
+    smtp_use_tls: bool = True
+    smtp_from_email: str = ""
+    smtp_from_name: str = "Keyfactor SignPortal"
+    app_public_url: str = "http://localhost:8081"
+
     class Config:
         env_file = ".env"
 

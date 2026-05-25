@@ -10,7 +10,10 @@ import AdminSettingsPage from './pages/AdminSettingsPage';
 import UsersPage from './pages/UsersPage';
 import SignServerSettingsPage from './pages/SignServerSettingsPage';
 import LdapSettingsPage from './pages/LdapSettingsPage';
+import SmtpSettingsPage from './pages/SmtpSettingsPage';
 import DocumentPreviewPage from './pages/DocumentPreviewPage';
+import FailedDocumentsPage from './pages/FailedDocumentsPage';
+import MyDocumentsPage from './pages/MyDocumentsPage';
 import AppLayout from './layouts/AppLayout';
 import { api } from './api/client';
 
@@ -32,6 +35,9 @@ export default function App() {
     <Route path='/users' element={Wrap(<UsersPage />)} />
     <Route path='/signserver-settings' element={Wrap(<SignServerSettingsPage />)} />
     <Route path='/ldap-settings' element={Wrap(<LdapSettingsPage />)} />
+    <Route path='/smtp-settings' element={Wrap(<SmtpSettingsPage />)} />
+    <Route path='/failed-documents' element={Wrap(<FailedDocumentsPage />)} />
+    <Route path='/my-documents' element={Wrap(<MyDocumentsPage />)} />
     <Route path='/document-preview/:id' element={Wrap(<DocumentPreviewPage />)} />
     <Route path='/logout' element={<Navigate to='/login' />} />
     <Route path='*' element={<Navigate to={t ? '/dashboard' : '/login'} />} />

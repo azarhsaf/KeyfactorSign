@@ -116,3 +116,24 @@ def place(document_id: int, workflow_signer_id: int = Form(...), page_number: in
     db.add(p); db.commit()
     add_audit(db, 'SAVE_SIGNATURE_PLACEMENT', user.id, document_id)
     return {"message": "saved"}
+
+
+@router.get('/my')
+def my_docs(db: Session = Depends(get_db), user=Depends(get_current_user)):
+    return [_doc_to_json(d, db) for d in db.query(Document).filter(Document.uploaded_by == user.id).order_by(Document.id.desc()).all()]
+
+@router.get('/failed')
+def failed_docs(db: Session = Depends(get_db), user=Depends(get_current_user)):
+    return [_doc_to_json(d, db) for d in db.query(Document).filter(Document.status == 'Failed').order_by(Document.id.desc()).all()]
+
+@router.get('/{document_id}/preview-original')
+def preview_original(document_id: int, db: Session = Depends(get_db), user=Depends(get_current_user)):
+    d = db.query(Document).filter(Document.id == document_id).first()
+    if not d: raise HTTPException(404, 'Not found')
+    return FileResponse(d.original_file_path, media_type='application/pdf')
+
+@router.get('/{document_id}/preview-signed')
+def preview_signed(document_id: int, db: Session = Depends(get_db), user=Depends(get_current_user)):
+    d = db.query(Document).filter(Document.id == document_id).first()
+    if not d or not d.signed_file_path: raise HTTPException(404, 'Signed file not available')
+    return FileResponse(d.signed_file_path, media_type='application/pdf')
