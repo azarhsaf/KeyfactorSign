@@ -8,6 +8,7 @@ class AuditLog(Base):
     document_id = Column(Integer, ForeignKey("documents.id"), nullable=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     action = Column(String(100), nullable=False)
+    status = Column(String(30), nullable=True)
     details = Column(Text, nullable=True)
     ip_address = Column(String(100), nullable=True)
     user_agent = Column(String(255), nullable=True)

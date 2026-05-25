@@ -46,6 +46,15 @@ class Settings(BaseSettings):
     smtp_from_name: str = "Keyfactor SignPortal"
     app_public_url: str = "http://localhost:8081"
 
+    brand_product_name: str = "Keyfactor SignPortal"
+    brand_company_name: str = "Keyfactor"
+    brand_logo_path: str = ""
+    brand_favicon_path: str = ""
+    brand_primary_color: str = "#0f172a"
+    brand_secondary_color: str = "#2563eb"
+    brand_login_background_text: str = "Secure signing workflows powered by SignServer"
+    brand_footer_text: str = "Keyfactor SignPortal"
+
     class Config:
         env_file = ".env"
 

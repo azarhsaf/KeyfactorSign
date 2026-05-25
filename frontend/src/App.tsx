@@ -14,6 +14,8 @@ import SmtpSettingsPage from './pages/SmtpSettingsPage';
 import DocumentPreviewPage from './pages/DocumentPreviewPage';
 import FailedDocumentsPage from './pages/FailedDocumentsPage';
 import MyDocumentsPage from './pages/MyDocumentsPage';
+import BrandingSettingsPage from './pages/BrandingSettingsPage';
+import SystemHealthPage from './pages/SystemHealthPage';
 import AppLayout from './layouts/AppLayout';
 import { api } from './api/client';
 
@@ -38,6 +40,8 @@ export default function App() {
     <Route path='/smtp-settings' element={Wrap(<SmtpSettingsPage />)} />
     <Route path='/failed-documents' element={Wrap(<FailedDocumentsPage />)} />
     <Route path='/my-documents' element={Wrap(<MyDocumentsPage />)} />
+    <Route path='/branding-settings' element={Wrap(<BrandingSettingsPage />)} />
+    <Route path='/system-health' element={Wrap(<SystemHealthPage />)} />
     <Route path='/document-preview/:id' element={Wrap(<DocumentPreviewPage />)} />
     <Route path='/logout' element={<Navigate to='/login' />} />
     <Route path='*' element={<Navigate to={t ? '/dashboard' : '/login'} />} />
