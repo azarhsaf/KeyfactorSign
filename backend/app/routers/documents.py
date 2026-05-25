@@ -137,3 +137,18 @@ def preview_signed(document_id: int, db: Session = Depends(get_db), user=Depends
     d = db.query(Document).filter(Document.id == document_id).first()
     if not d or not d.signed_file_path: raise HTTPException(404, 'Signed file not available')
     return FileResponse(d.signed_file_path, media_type='application/pdf')
+
+
+@router.get('/{document_id}/signature-placement')
+def get_placements(document_id: int, db: Session = Depends(get_db), user=Depends(get_current_user)):
+    rows = db.query(SignaturePlacement).filter(SignaturePlacement.document_id == document_id).all()
+    return [{
+        "id": r.id,
+        "workflow_signer_id": r.workflow_signer_id,
+        "page_number": r.page_number,
+        "x": r.x,
+        "y": r.y,
+        "width": r.width,
+        "height": r.height,
+        "signature_text": r.signature_text,
+    } for r in rows]
