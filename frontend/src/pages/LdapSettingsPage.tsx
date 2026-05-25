@@ -1,0 +1,3 @@
+import { useEffect, useState } from 'react'; import { api } from '../api/client';
+export default function LdapSettingsPage(){const [cfg,setCfg]=useState<any>({}); const [test,setTest]=useState<any>(null); useEffect(()=>{api.get('/admin/settings/ldap').then(r=>setCfg(r.data))},[])
+return <div className='space-y-4'><h2 className='text-2xl font-semibold'>LDAP Settings</h2><div className='bg-white border rounded p-4 text-sm space-y-2'>{Object.entries(cfg).map(([k,v])=><div key={k}><b>{k}</b>: {String(v)}</div>)}<button onClick={async()=>setTest((await api.get('/admin/ldap/test')).data)} className='bg-slate-900 text-white px-3 py-2 rounded'>Test LDAP Connection</button>{test&&<pre className='bg-slate-50 p-2 mt-2'>{JSON.stringify(test,null,2)}</pre>}</div></div>}
