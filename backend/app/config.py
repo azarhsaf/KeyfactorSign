@@ -2,6 +2,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     app_name: str = "Keyfactor SignPortal"
+    app_version: str = "dev"
     secret_key: str = "change_me"
     cors_origins: str = "http://localhost:8081"
     database_url: str = "postgresql+psycopg2://signportal:signportal_pass@db:5432/signportal"

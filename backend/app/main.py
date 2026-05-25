@@ -17,7 +17,7 @@ app.add_middleware(CORSMiddleware, allow_origins=[x.strip() for x in settings.co
 
 @app.get('/api/health')
 def health():
-    return {"status":"ok","app":"Keyfactor SignPortal"}
+    return {"status":"ok","app":"Keyfactor SignPortal","version": settings.app_version}
 
 app.include_router(auth.router)
 app.include_router(dashboard.router)
