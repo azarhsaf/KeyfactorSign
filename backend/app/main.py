@@ -25,3 +25,24 @@ app.include_router(documents.router)
 app.include_router(workflows.router)
 app.include_router(audit.router)
 app.include_router(admin.router)
+
+from app.services.settings_service import get_category
+from app.database import SessionLocal
+
+@app.get('/api/branding')
+def public_branding():
+    db = SessionLocal()
+    try:
+        cfg = {
+            "brand_product_name": settings.brand_product_name,
+            "brand_company_name": settings.brand_company_name,
+            "brand_logo_path": settings.brand_logo_path,
+            "brand_primary_color": settings.brand_primary_color,
+            "brand_secondary_color": settings.brand_secondary_color,
+            "brand_login_background_text": settings.brand_login_background_text,
+            "brand_footer_text": settings.brand_footer_text,
+        }
+        cfg.update(get_category(db, 'branding'))
+        return cfg
+    finally:
+        db.close()

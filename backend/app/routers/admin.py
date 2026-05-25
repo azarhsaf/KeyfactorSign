@@ -9,6 +9,7 @@ from app.services.signserver_connector import SignServerConnector
 from app.services.ldap_connector import LDAPConnector
 from app.services.email_service import EmailService
 from app.services.settings_service import get_category, set_setting, masked_payload
+from app.services.runtime_config_service import effective_ldap_config, effective_smtp_config
 from app.config import settings
 
 router = APIRouter(prefix='/api/admin', tags=['admin'])
@@ -87,20 +88,7 @@ def ss_test_sign(a=Depends(require_admin)):
 
 @router.get('/ldap/settings')
 def ldap_get(db: Session = Depends(get_db), a=Depends(require_admin)):
-    cfg = {
-        "ldap_enabled": settings.ldap_enabled,
-        "ldap_url": settings.ldap_url,
-        "ldap_bind_dn": settings.ldap_bind_dn,
-        "ldap_bind_password": settings.ldap_bind_password,
-        "ldap_base_dn": settings.ldap_base_dn,
-        "ldap_user_filter": settings.ldap_user_filter,
-        "ldap_admin_group": settings.ldap_admin_group,
-        "ldap_signer_group": settings.ldap_signer_group,
-        "ldap_viewer_group": settings.ldap_viewer_group,
-        "ldap_tls_verify": settings.ldap_tls_verify,
-    }
-    cfg.update(get_category(db,'ldap'))
-    return masked_payload(cfg)
+    return masked_payload(effective_ldap_config(db))
 
 @router.post('/ldap/settings')
 def ldap_save(db: Session = Depends(get_db), a=Depends(require_admin), ldap_enabled: str = Form(None), ldap_url: str = Form(None), ldap_bind_dn: str = Form(None), ldap_bind_password: str = Form(None), ldap_base_dn: str = Form(None), ldap_user_filter: str = Form(None), ldap_admin_group: str = Form(None), ldap_signer_group: str = Form(None), ldap_viewer_group: str = Form(None), ldap_tls_verify: str = Form(None)):
@@ -113,16 +101,16 @@ def ldap_save(db: Session = Depends(get_db), a=Depends(require_admin), ldap_enab
 
 @router.get('/ldap/test')
 def ldap_test(a=Depends(require_admin)):
-    return LDAPConnector().test_connection()
+    return LDAPConnector(effective_ldap_config(db)).test_connection()
 
 @router.post('/ldap/test-login')
-def ldap_test_login(username: str = Form(...), password: str = Form(...), a=Depends(require_admin)):
-    data = LDAPConnector().authenticate(username, password)
+def ldap_test_login(username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db), a=Depends(require_admin)):
+    data = LDAPConnector(effective_ldap_config(db)).authenticate(username, password)
     return {"ok": bool(data), "user": data}
 
 @router.get('/ldap/search-users')
-def ldap_search_users(query: str = Query(''), a=Depends(require_admin)):
-    return LDAPConnector().search_users(query)
+def ldap_search_users(query: str = Query(''), db: Session = Depends(get_db), a=Depends(require_admin)):
+    return LDAPConnector(effective_ldap_config(db)).search_users(query)
 
 @router.post('/ldap/sync-user')
 def ldap_sync_user(username: str = Form(...), role: str = Form('signer'), db: Session = Depends(get_db), a=Depends(require_admin)):
@@ -136,8 +124,7 @@ def ldap_sync_user(username: str = Form(...), role: str = Form('signer'), db: Se
 
 @router.get('/smtp/settings')
 def smtp_settings(db: Session = Depends(get_db), a=Depends(require_admin)):
-    cfg = EmailService().settings_dict(); cfg.update(get_category(db,'smtp'))
-    return masked_payload(cfg)
+    return masked_payload(effective_smtp_config(db))
 
 @router.post('/smtp/settings')
 def smtp_settings_save(db: Session = Depends(get_db), a=Depends(require_admin), smtp_enabled: str = Form(None), smtp_host: str = Form(None), smtp_port: str = Form(None), smtp_username: str = Form(None), smtp_password: str = Form(None), smtp_use_tls: str = Form(None), smtp_from_email: str = Form(None), smtp_from_name: str = Form(None), app_public_url: str = Form(None)):
@@ -150,7 +137,7 @@ def smtp_settings_save(db: Session = Depends(get_db), a=Depends(require_admin), 
 
 @router.post('/smtp/test')
 def smtp_test(a=Depends(require_admin), db: Session = Depends(get_db)):
-    cfg = EmailService().settings_dict();
+    cfg = effective_smtp_config(db)
     return {"ok": bool(cfg['smtp_host']), "config": masked_payload(cfg)}
 
 @router.post('/smtp/send-test')

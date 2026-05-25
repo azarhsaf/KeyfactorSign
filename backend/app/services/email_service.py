@@ -2,14 +2,18 @@ import smtplib
 from email.mime.text import MIMEText
 from app.config import settings
 from app.models.settings import EmailLog
+from app.services.runtime_config_service import effective_smtp_config
 
 class EmailService:
-    def settings_dict(self):
+    def settings_dict(self, db=None):
+        if db is not None:
+            return effective_smtp_config(db)
         return {
             "smtp_enabled": getattr(settings, 'smtp_enabled', False),
             "smtp_host": getattr(settings, 'smtp_host', ''),
             "smtp_port": getattr(settings, 'smtp_port', 587),
             "smtp_username": getattr(settings, 'smtp_username', ''),
+            "smtp_password": getattr(settings, 'smtp_password', ''),
             "smtp_use_tls": getattr(settings, 'smtp_use_tls', True),
             "smtp_from_email": getattr(settings, 'smtp_from_email', ''),
             "smtp_from_name": getattr(settings, 'smtp_from_name', 'Keyfactor SignPortal'),
@@ -17,7 +21,7 @@ class EmailService:
         }
 
     def send(self, db, to_email: str, subject: str, body: str, document_id=None):
-        cfg = self.settings_dict()
+        cfg = self.settings_dict(db)
         log = EmailLog(document_id=document_id, recipient=to_email, subject=subject, status='queued')
         db.add(log); db.commit(); db.refresh(log)
         if not cfg['smtp_enabled']:
@@ -32,7 +36,7 @@ class EmailService:
                 if cfg['smtp_use_tls']:
                     s.starttls()
                 if cfg['smtp_username']:
-                    s.login(cfg['smtp_username'], getattr(settings, 'smtp_password', ''))
+                    s.login(cfg['smtp_username'], cfg.get('smtp_password',''))
                 s.sendmail(cfg['smtp_from_email'], [to_email], msg.as_string())
             log.status = 'sent'; db.commit()
             return {"ok": True}
